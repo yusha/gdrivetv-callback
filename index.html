@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDrive TV - Authorization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #8b8b9a;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .status {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .status.success {
+            background: rgba(52, 168, 83, 0.15);
+            border: 1px solid rgba(52, 168, 83, 0.3);
+        }
+
+        .status.error {
+            background: rgba(234, 67, 53, 0.15);
+            border: 1px solid rgba(234, 67, 53, 0.3);
+        }
+
+        .status.waiting {
+            background: rgba(66, 133, 244, 0.15);
+            border: 1px solid rgba(66, 133, 244, 0.3);
+        }
+
+        .status-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .status-title {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .status-message {
+            color: #b0b0c0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .code-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .code-label {
+            color: #8b8b9a;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .code-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #4ade80;
+            word-break: break-all;
+            user-select: all;
+            cursor: text;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #4285f4, #1a73e8);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(66, 133, 244, 0.4);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-btn.copied {
+            background: linear-gradient(135deg, #34a853, #1e8e3e);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instructions ol {
+            color: #8b8b9a;
+            font-size: 13px;
+            line-height: 1.8;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #5a5a6a;
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: #4285f4;
+            text-decoration: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .code-display {
+                font-size: 12px;
+            }
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(66, 133, 244, 0.3);
+            border-top-color: #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📺</div>
+        <h1>GDrive TV</h1>
+        <p class="subtitle">Google Drive Media Player for TV</p>
+
+        <div id="content">
+            <!-- Content will be dynamically inserted here -->
+        </div>
+
+        <div class="footer">
+            <p>This page is part of the GDrive TV app authentication flow.</p>
+        </div>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                code: params.get('code'),
+                error: params.get('error'),
+                error_description: params.get('error_description')
+            };
+        }
+
+        // Copy to clipboard
+        async function copyCode() {
+            const codeElement = document.getElementById('authCode');
+            const btn = document.getElementById('copyBtn');
+            
+            try {
+                await navigator.clipboard.writeText(codeElement.textContent);
+                btn.innerHTML = '✓ Copied!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.innerHTML = '📋 Copy Code';
+                    btn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = codeElement.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                btn.innerHTML = '✓ Copied!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.innerHTML = '📋 Copy Code';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }
+        }
+
+        // Render the page content
+        function render() {
+            const content = document.getElementById('content');
+            const params = getUrlParams();
+
+            if (params.error) {
+                // Error state
+                content.innerHTML = `
+                    <div class="status error">
+                        <div class="status-icon">❌</div>
+                        <div class="status-title">Authorization Failed</div>
+                        <div class="status-message">
+                            ${params.error_description || params.error || 'An unknown error occurred'}
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h3>💡 What to do:</h3>
+                        <ol>
+                            <li>Go back to GDrive TV on your TV</li>
+                            <li>Press Back to cancel</li>
+                            <li>Try signing in again</li>
+                            <li>Make sure you allow all requested permissions</li>
+                        </ol>
+                    </div>
+                `;
+            } else if (params.code) {
+                // Success state - show the code
+                content.innerHTML = `
+                    <div class="status success">
+                        <div class="status-icon">✅</div>
+                        <div class="status-title">Authorization Successful!</div>
+                        <div class="status-message">
+                            Copy the code below and paste it into your TV app.
+                        </div>
+                    </div>
+                    
+                    <div class="code-container">
+                        <div class="code-label">Your Authorization Code</div>
+                        <div class="code-display" id="authCode">${escapeHtml(params.code)}</div>
+                    </div>
+                    
+                    <button class="copy-btn" id="copyBtn" onclick="copyCode()">
+                        📋 Copy Code
+                    </button>
+                    
+                    <div class="instructions">
+                        <h3>📺 Next Steps:</h3>
+                        <ol>
+                            <li>Tap "Copy Code" button above</li>
+                            <li>Go to GDrive TV on your TV</li>
+                            <li>Paste the code in the input field</li>
+                            <li>Press "Submit Code"</li>
+                        </ol>
+                    </div>
+                `;
+            } else {
+                // No code yet - landing page
+                content.innerHTML = `
+                    <div class="status waiting">
+                        <div class="spinner"></div>
+                        <div class="status-title">Waiting for Authorization</div>
+                        <div class="status-message">
+                            If you were redirected here without a code, please go back and try the sign-in process again from your TV app.
+                        </div>
+                    </div>
+                    
+                    <div class="instructions">
+                        <h3>📱 How to Sign In:</h3>
+                        <ol>
+                            <li>Open GDrive TV on your TV</li>
+                            <li>Click "Sign in with Google"</li>
+                            <li>Scan the QR code with your phone</li>
+                            <li>Sign in to Google and allow access</li>
+                            <li>You'll be redirected here with a code</li>
+                            <li>Copy the code and paste it into your TV app</li>
+                        </ol>
+                    </div>
+                `;
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        render();
+    </script>
+</body>
+</html>
